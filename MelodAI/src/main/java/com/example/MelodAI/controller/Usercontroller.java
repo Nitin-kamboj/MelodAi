@@ -36,9 +36,22 @@ public class Usercontroller {
             String username = loginRequest.get("username");
             String password = loginRequest.get("password");
             Map<String, String> response = userservice.loginUser(username, password);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request){
+        String refreshToken = request.get("refreshToken");
+        try {
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                return new ResponseEntity<>(Map.of("error", "Refresh token is required!"), HttpStatus.BAD_REQUEST);
+            }
+            Map<String, String> response = userservice.refreshAccessToken(refreshToken);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
 }

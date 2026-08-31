@@ -1,29 +1,35 @@
 package com.example.MelodAI.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class jwtUtil {
 
     private final String security_key = "SuperSecretMelodAIMusicGenerationAppTokenSigningKey2026!!!";
-    private final long EXPIRATION_TIME = 86400000;
+    private long accessTokenExpirationMs = 900000;
+    private long refreshTokenExpirationMs = 604800000;
 
     private SecretKey getSignedKey(){
         return Keys.hmacShaKeyFor(security_key.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username){
-        return Jwts.builder().subject(username).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)).signWith(getSignedKey()).compact();
+    public String generateAccessToken(String username){
+        return Jwts.builder().subject(username).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs)).signWith(getSignedKey()).compact();
     }
 
+    public String generateRefreshToken(String username){
+        return Jwts.builder().subject(username).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs)).signWith(getSignedKey()).compact();
+    }
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
     }
@@ -38,5 +44,13 @@ public class jwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token); // Throws exception if invalid or expired
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
