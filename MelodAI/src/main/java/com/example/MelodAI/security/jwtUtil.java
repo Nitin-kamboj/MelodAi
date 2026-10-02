@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -15,9 +16,17 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class jwtUtil {
 
-    private final String security_key = "SuperSecretMelodAIMusicGenerationAppTokenSigningKey2026!!!";
-    private long accessTokenExpirationMs = 900000;
-    private long refreshTokenExpirationMs = 604800000;
+    // These values coming from application.properties (we don't wanna put private keys in here so)
+    @Value("${accessTokenExpirationMs}")
+    private long accessTokenExpirationMs;
+    @Value("${security_key}")
+    private String security_key;
+    @Value("${refreshTokenExpirationMs}")
+    private long refreshTokenExpirationMs;
+
+//    private final String security_key = "SuperSecretMelodAIMusicGenerationAppTokenSigningKey2026!!!";
+//    private long accessTokenExpirationMs = 900000;
+//    private long refreshTokenExpirationMs = 604800000;
 
     private SecretKey getSignedKey(){
         return Keys.hmacShaKeyFor(security_key.getBytes(StandardCharsets.UTF_8));
@@ -34,8 +43,12 @@ public class jwtUtil {
         return getClaims(token).getSubject();
     }
 
+//    public boolean isTokenValid(String token, String username) {
+//        return extractUsername(token).equals(username) && !getClaims(token).getExpiration().before(new Date());
+//    }
     public boolean isTokenValid(String token, String username) {
-        return extractUsername(token).equals(username) && !getClaims(token).getExpiration().before(new Date());
+        final String extractedUsername = extractUsername(token);
+        return (extractedUsername.equals(username) && validateToken(token));
     }
 
     private Claims getClaims(String token) {

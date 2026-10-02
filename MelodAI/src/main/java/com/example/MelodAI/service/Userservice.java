@@ -5,24 +5,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.example.MelodAI.model.RefreshToken;
-import com.example.MelodAI.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.MelodAI.model.Credits;
+import com.example.MelodAI.model.RefreshToken;
 import com.example.MelodAI.model.Users;
+import com.example.MelodAI.repository.RefreshTokenRepository;
 import com.example.MelodAI.repository.creditsRepository;
 import com.example.MelodAI.repository.usersRepository;
 import com.example.MelodAI.security.jwtUtil;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 
 @Service
-public class Userservice {
+public class Userservice { // Fixed class name convention
 
     @Autowired
     private usersRepository usersRepository;
@@ -39,28 +37,26 @@ public class Userservice {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    private long refreshTokenExpirationMs= 9000000;
+    private final long refreshTokenExpirationMs = 9000000;
 
     @Transactional
     public Users registerUser(Users users){
-        Optional<Users> existingUser = usersRepository.findByUsername(users.getUsername());
-
-        if (existingUser.isPresent()) {
-            // If true, the user exists in the database!
+        if (usersRepository.findByUsername(users.getUsername()).isPresent()) {
             throw new RuntimeException("Username is already taken!");
         }
 
-        Optional<Users> existingEmail = usersRepository.findByEmail(users.getEmail());
-        if (existingEmail.isPresent()) {
+        if (usersRepository.findByEmail(users.getEmail()).isPresent()) {
             throw new RuntimeException("Email is already registered!");
         }
 
+        // Hash password
         users.setPassword(passwordEncoder.encode(users.getPassword()));
 
-        Users savedUser = usersRepository.save((users));
+        Users savedUser = usersRepository.save(users);
+
         Credits initialCredits = new Credits();
-        initialCredits.setUser(savedUser); // Connects the 1:1 link
-        initialCredits.setCredits(10);     // Grants 10 startup points
+        initialCredits.setUser(savedUser);
+        initialCredits.setCredits(10);
 
         creditsRepository.save(initialCredits);
 
@@ -69,29 +65,25 @@ public class Userservice {
 
     @Transactional
     public Map<String, String> loginUser(String username, String password){
-        Optional <Users> existingUser = usersRepository.findByUsername(username);
-        if(existingUser.isEmpty()){
-            throw new RuntimeException("User not Found!");
-        }
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        if(passwordEncoder.matches(password , existingUser.get().getPassword())){
-            Users user = usersRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found!"));
+        if(passwordEncoder.matches(password, user.getPassword())){
             String accessToken = jwtUtil.generateAccessToken(username);
             RefreshToken refreshToken = generateRefreshToken(user);
-//            AccessToken accessToken =
+
             Map<String, String> response = new HashMap<>();
-            response.put("RefreshToken", refreshToken.getToken());
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken.getToken());
             response.put("username", username);
-            response.put("AccessToken", accessToken);
 
             return response;
-        }
-        else {
+        } else {
             throw new RuntimeException("Invalid username or password!");
         }
     }
 
+    // this function is used in login only
     @Transactional
     public RefreshToken generateRefreshToken(Users user){
         refreshTokenRepository.deleteByUser(user);
