@@ -1,5 +1,6 @@
 package com.example.MelodAI.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.example.MelodAI.model.Credits;
@@ -17,8 +18,9 @@ public class MusicService {
     private final creditsRepository creditsRepository;
     private final MusicGeneratorWorker musicGeneratorWorker;
 
-    // @Transactional
-    public Music_Generated musicGenerated(Long userId, String title){
+     @Transactional
+    public Music_Generated musicGenerated(Long userId, String title){ //title here is the prompt given by the user
+        // check the userCredits
         Credits userCredits = creditsRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User credit profile not found."));
 
@@ -34,7 +36,7 @@ public class MusicService {
         track.setStatus("PENDING");
 
         Music_Generated savedTrack = musGenRepository.saveAndFlush(track);
-        musicGeneratorWorker.generateMusicAsync(savedTrack.getId());
+        musicGeneratorWorker.generateMusicAsync(savedTrack.getId(),title);
 
         return savedTrack;
     }
