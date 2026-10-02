@@ -17,9 +17,10 @@ import com.example.MelodAI.service.MusicService;
 @RequestMapping("/api/music")
 public class MusicController {
     @Autowired
-    MusicService musicService;
+    MusicService musicService;    // IOC (Inversion of control...  Dependency injection)
 
-    @PostMapping("/generate")
+    // generate the music from the lyria(Google AI)
+    @PostMapping("/generate_music")
     public ResponseEntity<?> generateMusic(@RequestParam Long userId, @RequestParam String prompt){
         try {
             Music_Generated track = musicService.musicGenerated(userId, prompt);
@@ -41,7 +42,7 @@ public class MusicController {
     }
 
     // 2. Fetch the entire song history for a user
-    @GetMapping("/user/{userId}")
+    @GetMapping("/music/{userId}")
     public ResponseEntity<java.util.List<Music_Generated>> getUserLibrary(@PathVariable Long userId) {
         return ResponseEntity.ok(musicService.getUserMusicLibrary(userId));
     }
