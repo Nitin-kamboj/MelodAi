@@ -38,7 +38,7 @@ public class MusicGeneratorWorker {
     private String apiKey;
 
     @Async
-    public void generateMusicAsync(Long trackId) {
+    public void generateMusicAsync(Long trackId, String title) {
 
         Music_Generated track = musGenRepository.findById(trackId)
                 .orElseThrow(() -> new RuntimeException("Track not found: " + trackId));
@@ -66,13 +66,7 @@ public class MusicGeneratorWorker {
             CreateModelInteraction params = CreateModelInteraction.builder()
                     .model(Model.of("lyria-3-clip-preview"))
                     .input(InteractionsInput.of(
-                            "An energetic Punjabi hip-hop track with upbeat 110 BPM modern trap beats, heavy bass, Punjabi dhol, tumbi riffs, and dynamic vocals. Energetic, danceable, cinematic drop." +
-                                                                        "[Verse 1]" +
-                                                                        "Dil vich tu hamesha vasda," +
-                                                                        "Har pal mera ikko gal dasda." +
-                                                                        "[Chorus]" +
-                                                                        "Nachle sohniye tu mere naal," +
-                                                                        "Aaj di raat na puchh koi sawaal."))
+                            title))
                     .build();
 
             log.info("Sending request to Lyria...");
