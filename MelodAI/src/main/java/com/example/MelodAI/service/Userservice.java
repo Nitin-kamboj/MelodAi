@@ -20,7 +20,7 @@ import com.example.MelodAI.security.jwtUtil;
 import jakarta.transaction.Transactional;
 
 @Service
-public class Userservice { // Fixed class name convention
+public class Userservice {
 
     @Autowired
     private usersRepository usersRepository;

@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // 2. Define public endpoints
-                        .requestMatchers("/api/users/register", "/api/users/login", "/api/users/refresh", "/api/users/logout").permitAll()
+                        .requestMatchers("/api/users/register", "/api/users/login", "/api/users/refresh", "/api/users/logout","/charge").permitAll()
                         // 3. All other endpoints require a valid token
                         .anyRequest().authenticated()
                 )
