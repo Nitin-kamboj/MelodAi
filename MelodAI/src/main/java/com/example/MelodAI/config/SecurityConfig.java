@@ -1,9 +1,11 @@
 package com.example.MelodAI.config;
 
-import com.example.MelodAI.security.JwtAuthenticationFilter; // Make sure to import your future filter
+import com.example.MelodAI.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    private JwtAuthenticationFilter jwtFilter; // We will write this next!
+    private JwtAuthenticationFilter jwtFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
@@ -27,16 +29,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults()) // 👈 Crucial: Enable CORS for frontend communication
                 .csrf(AbstractHttpConfigurer::disable)
-                // 1. Make session stateless (crucial for JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 2. Define public endpoints
-                        .requestMatchers("/api/users/register", "/api/users/login", "/api/users/refresh", "/api/users/logout","/charge","/api/payment/**").permitAll()
-                        // 3. All other endpoints require a valid token
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 👈 Allow browser preflight checks
+                        // Updated from "/api/users/**" to "/api/user/**" matching your controller
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/refresh", "/api/user/logout", "/charge", "/api/payment/**", "/api/music/all").permitAll()
                         .anyRequest().authenticated()
                 )
-                // 4. Add your JWT filter before the standard username/password filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
