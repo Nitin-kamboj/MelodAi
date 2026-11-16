@@ -9,5 +9,5 @@ import com.example.MelodAI.model.Music_Generated;
 public interface mus_genRepository extends JpaRepository<Music_Generated, Long> {
 
     List<Music_Generated> findByUser_Id(Long userId);
-
+    List<Music_Generated> findByFilePathIsNotNull();
 }
