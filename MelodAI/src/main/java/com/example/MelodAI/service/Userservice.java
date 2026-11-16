@@ -3,9 +3,9 @@ package com.example.MelodAI.service;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import com.example.MelodAI.model.Credits;
 import com.example.MelodAI.model.RefreshToken;
 import com.example.MelodAI.model.Users;
 import com.example.MelodAI.repository.RefreshTokenRepository;
-import com.example.MelodAI.repository.creditsRepository;
+import com.example.MelodAI.repository.CreditsRepository;
 import com.example.MelodAI.repository.usersRepository;
 import com.example.MelodAI.security.jwtUtil;
 
@@ -26,7 +26,7 @@ public class Userservice {
     private usersRepository usersRepository;
 
     @Autowired
-    private creditsRepository creditsRepository;
+    private CreditsRepository creditsRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -112,5 +112,27 @@ public class Userservice {
         response.put("accessToken", newAccessToken);
         response.put("refreshToken", requestRefreshToken);
         return response;
+    }
+
+    @Transactional
+    public void logoutUser(Authentication authentication) {
+
+        // Check whether the user is authenticated
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // Extract username from authentication
+        String username = authentication.getName();
+
+        // Find user in database
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found!")
+                );
+
+        // Delete user's refresh token
+        refreshTokenRepository.deleteByUser(user);
     }
 }

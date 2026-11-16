@@ -24,8 +24,8 @@ public class StripeService {
 
     public String createCheckoutSession(Long amount, String productName) throws StripeException {
         // Redirect URLs after payment success or cancellation
-        String successUrl = frontendUrl + "/payment/success?session_id={CHECKOUT_SESSION_ID}";
-        String cancelUrl = frontendUrl + "/payment/cancel";
+        String successUrl = frontendUrl + "/dashboard?session_id={CHECKOUT_SESSION_ID}";
+        String cancelUrl = frontendUrl + "/checkout";
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.MelodAI.model.Credits;
 import com.example.MelodAI.model.Music_Generated;
-import com.example.MelodAI.repository.creditsRepository;
+import com.example.MelodAI.repository.CreditsRepository;
 import com.example.MelodAI.repository.mus_genRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class MusicService {
 
     private final mus_genRepository musGenRepository;
-    private final creditsRepository creditsRepository;
+    private final CreditsRepository creditsRepository;
     private final MusicGeneratorWorker musicGeneratorWorker;
 
      @Transactional
@@ -51,4 +51,9 @@ public class MusicService {
     public java.util.List<Music_Generated> getUserMusicLibrary(Long userId) {
         return musGenRepository.findByUser_Id(userId);
     }
+
+    public java.util.List<Music_Generated> getAllMusicService() {
+        return musGenRepository.findByFilePathIsNotNull();
+    }
+
 }
