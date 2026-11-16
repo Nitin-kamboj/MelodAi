@@ -87,6 +87,7 @@ public class Userservice {
     @Transactional
     public RefreshToken generateRefreshToken(Users user){
         refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.flush();
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
