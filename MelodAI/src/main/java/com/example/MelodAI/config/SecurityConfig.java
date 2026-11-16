@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 👈 Allow browser preflight checks
                         // Updated from "/api/users/**" to "/api/user/**" matching your controller
-                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/refresh", "/api/user/logout", "/charge", "/api/payment/**", "/api/music/all").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/refresh", "/api/user/logout", "/charge", "/api/payment/**", "/api/music/all", "/api/credits/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
