@@ -3,7 +3,7 @@ package com.example.MelodAI.controller;
 import com.example.MelodAI.model.Users;
 import com.example.MelodAI.model.Credits;
 import com.example.MelodAI.repository.usersRepository;
-import com.example.MelodAI.repository.creditsRepository;
+import com.example.MelodAI.repository.CreditsRepository;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.StripeObject;
@@ -28,7 +28,7 @@ public class WebhookController {
     private usersRepository userRepository;
 
     @Autowired
-    private creditsRepository creditsRepository;
+    private CreditsRepository creditsRepository;
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(

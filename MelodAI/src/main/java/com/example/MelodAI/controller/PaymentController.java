@@ -17,7 +17,7 @@ public class PaymentController {
     private StripeService stripeService;
 
     @PostMapping("/create-checkout-session")
-    public ResponseEntity<?> createCheckoutSession(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> createCheckoutSession(@RequestBody (required = false) Map<String, Object> request) {
         try {
             // Extract amount (in cents) and product name from the incoming JSON request
             Long amount = Long.valueOf(request.getOrDefault("amount", 1000).toString());
