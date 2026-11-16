@@ -41,7 +41,7 @@ public class CreditsController {
                     // Fallback safety net: if a user row exists but somehow lacks a credits row, initialize it
                     Credits newCredits = new Credits();
                     newCredits.setUser(user);
-                    newCredits.setCredits(10); // default value from your entity
+                    newCredits.setCredits(0); // default value
                     return creditsRepository.save(newCredits);
                 });
 
