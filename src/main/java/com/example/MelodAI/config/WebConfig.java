@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${FRONTEND_URL:https://melod-ai-frontend-git-main-melod-ai1.vercel.app}")
+    @Value("${FRONTEND_URL:https://melod-ai-frontend-7b3r.vercel.app}")
     private String frontendUrl;
 
     @Override
@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:5173",
                         "http://localhost:3000",
                         frontendUrl,
-                        "https://*.vercel.app"
+                        "https://melod-ai-frontend-git-main-melod-ai1.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
